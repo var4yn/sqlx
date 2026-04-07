@@ -56,8 +56,9 @@ pub(crate) async fn authenticate(
     let username = format!("{}={}", USERNAME_ATTR, options.username);
     let username = match saslprep(&username) {
         Ok(v) => v,
-        // TODO(danielakhterov): Remove panic when we have proper support for configuration errors
-        Err(_) => panic!("Failed to saslprep username"),
+        Err(error) => {
+            return Err(Error::Configuration(Box::new(error)))
+        }
     };
 
     // nonce = "r=" c-nonce [s-nonce] ;; Second part provided by server.
@@ -90,9 +91,9 @@ pub(crate) async fn authenticate(
     let password = options.password.as_deref().unwrap_or_default();
     let password = match saslprep(password) {
         Ok(v) => v,
-        // The behavior is similar to what was observed when using SASLprep for username.
-        // TODO: Remove panic when we have proper support for configuration errors
-        Err(_) => panic!("Failed to saslprep password"),
+        Err(error) => {
+            return Err(Error::Configuration(Box::new(error)))
+        }
     };
 
     // SaltedPassword := Hi(Normalize(password), salt, i)
