@@ -56,9 +56,7 @@ pub(crate) async fn authenticate(
     let username = format!("{}={}", USERNAME_ATTR, options.username);
     let username = match saslprep(&username) {
         Ok(v) => v,
-        Err(error) => {
-            return Err(Error::Configuration(Box::new(error)))
-        }
+        Err(error) => return Err(Error::Configuration(Box::new(error))),
     };
 
     // nonce = "r=" c-nonce [s-nonce] ;; Second part provided by server.
@@ -91,9 +89,7 @@ pub(crate) async fn authenticate(
     let password = options.password.as_deref().unwrap_or_default();
     let password = match saslprep(password) {
         Ok(v) => v,
-        Err(error) => {
-            return Err(Error::Configuration(Box::new(error)))
-        }
+        Err(error) => return Err(Error::Configuration(Box::new(error))),
     };
 
     // SaltedPassword := Hi(Normalize(password), salt, i)
